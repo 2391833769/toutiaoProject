@@ -69,4 +69,3 @@ async def get_news_detail(new_id: int = Query(..., alias="id"), db: AsyncSession
             "relatedNews": related_news
         }
     }
-

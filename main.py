@@ -6,7 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from config.db_config import async_engine
 from models.user import Base
-from routers import news, user
+from routers import news, user, favorite
+from utils.exception_handlers import register_exception_handlers
 
 
 @asynccontextmanager
@@ -20,6 +21,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+register_exception_handlers(app)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -31,3 +34,4 @@ app.add_middleware(
 #挂载路由
 app.include_router(news.router)
 app.include_router(user.router)
+app.include_router(favorite.router)
