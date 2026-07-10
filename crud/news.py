@@ -1,13 +1,24 @@
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from cache.news_cache import set_cache_categories
+from cache.news_cache import get_cached_categories
 from models.news import Category, News
 
 
 # 查询新闻分类
 async def get_categories(db: AsyncSession, skip: int = 0, limit: int = 100):
+    data = await get_cached_categories()
+    if data:
+        return data
     stmt = select(Category).offset(skip).limit(limit)
     result = await db.execute(stmt)
-    return result.scalars().all()
+    categories = result.scalars().all()
+    # 存入缓存
+    if categories:
+        await set_cache_categories(jsonable_encoder(categories))
+    return categories 
 
 
 # 获取指定类型【对应页码】新闻列表
